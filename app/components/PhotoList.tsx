@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image"
 
 interface Photo {
   _id: string;
@@ -15,40 +16,40 @@ interface Photo {
 }
 
 const PhotoList = () => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchPhotos();
-  }, []);
+    fetchPhotos()
+  }, [])
 
   const fetchPhotos = async () => {
     try {
-      setLoading(true);
-      const response = await fetch("/api/photo");
+      setLoading(true)
+      const response = await fetch("/api/photo")
       
       if (response.ok) {
-        const data = await response.json();
-        setPhotos(data.photos || []);
+        const data = await response.json()
+        setPhotos(data.photos || [])
       } else {
-        setError("Failed to fetch photos");
+        setError("Failed to fetch photos")
       }
     } catch (error) {
-      console.error("Error fetching photos:", error);
-      setError("Error fetching photos");
+      console.error("Error fetching photos:", error)
+      setError("Error fetching photos")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const deletePhoto = async (photoId: string) => {
-    if (!confirm("Are you sure you want to delete this photo?")) return;
+    if (!confirm("Are you sure you want to delete this photo?")) return
 
     try {
       const response = await fetch(`/api/photo/${photoId}`, {
         method: "DELETE",
-      });
+      })
 
       if (response.ok) {
         setPhotos(photos.filter(photo => photo._id !== photoId));
@@ -59,7 +60,7 @@ const PhotoList = () => {
       console.error("Error deleting photo:", error);
       setError("Error deleting photo");
     }
-  };
+  }
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -67,14 +68,14 @@ const PhotoList = () => {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+  }
 
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -88,7 +89,7 @@ const PhotoList = () => {
           Retry
         </button>
       </div>
-    );
+    )
   }
 
   if (photos.length === 0) {
@@ -97,7 +98,7 @@ const PhotoList = () => {
         <p className="text-gray-500 text-lg">No photos uploaded yet</p>
         <p className="text-gray-400">Start by uploading your first photo!</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -115,11 +116,14 @@ const PhotoList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {photos.map((photo) => (
           <div key={photo._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="aspect-square overflow-hidden">
-              <img
+            <div className="relative aspect-square overflow-hidden">
+              <Image
                 src={photo.thumbnailUrl || photo.imageUrl}
                 alt={photo.title}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                fill
+                unoptimized
+                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                className="object-cover hover:scale-105 transition-transform duration-200"
               />
             </div>
             
@@ -162,7 +166,7 @@ const PhotoList = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PhotoList;
+export default PhotoList

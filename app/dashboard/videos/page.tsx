@@ -17,11 +17,16 @@ const VideosPage = () => {
       router.push("/login");
       return;
     }
+
+    if ((session.user as any)?.passwordRequiresReset) {
+      router.push("/update-password");
+      return;
+    }
   }, [session, status, router]);
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-purple-700 via-gray-300 to-gray-100">
         <Navigation />
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -35,16 +40,18 @@ const VideosPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-700 via-gray-300 to-gray-100">
       <Navigation />
       
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Videos</h1>
-          <p className="mt-2 text-gray-600">Manage and organize your uploaded videos.</p>
+          <h1 className="text-3xl font-bold text-black">My Videos</h1>
+          <p className="mt-2 text-black/80">Manage and organize your uploaded videos.</p>
         </div>
 
-        <VideoList />
+        <div className="bg-white/90 backdrop-blur-lg rounded-2xl border border-white/40 p-6 shadow-lg">
+          <VideoList />
+        </div>
       </main>
     </div>
   );

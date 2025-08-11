@@ -5,8 +5,10 @@ import { useSession } from "next-auth/react"
 interface Video {
   _id: string
   title: string
-  url: string
+  url?: string
+  videoUrl?: string
   thumbnail?: string
+  thumbnailUrl?: string
   size: number
   duration?: number
   userId: string
@@ -54,7 +56,6 @@ const VideoList = () => {
         throw new Error("Failed to delete video")
       }
       
-      // Remove from local state
       setVideos(prev => prev.filter(video => video._id !== videoId))
       alert("Video deleted successfully")
     } catch (error) {
@@ -124,76 +125,82 @@ const VideoList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {videos.map((video) => (
-            <div key={video._id} className="bg-white/5 rounded-lg overflow-hidden border border-white/10 hover:border-white/20 transition">
-              {/* Video Thumbnail */}
-              <div className="aspect-video bg-gray-800 relative group">
-                {video.thumbnail ? (
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-white/50 text-4xl">🎥</span>
-                  </div>
-                )}
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button
-                    onClick={() => window.open(video.url, '_blank')}
-                    className="bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition"
-                  >
-                    ▶️
-                  </button>
-                </div>
-              </div>
-
-              {/* Video Info */}
-              <div className="p-4">
-                <h3 className="text-white font-semibold text-lg mb-2 truncate">
-                  {video.title}
-                </h3>
-                
-                <div className="space-y-2 text-sm text-white/70">
-                  <div className="flex justify-between">
-                    <span>Size:</span>
-                    <span>{formatFileSize(video.size)}</span>
-                  </div>
-                  
-                  {video.duration && (
-                    <div className="flex justify-between">
-                      <span>Duration:</span>
-                      <span>{formatDuration(video.duration)}</span>
+          {videos.map((video) => {
+            const thumb = video.thumbnailUrl || video.thumbnail
+            const href = video.videoUrl || video.url
+            return (
+              <div key={video._id} className="bg-white/5 rounded-lg overflow-hidden border border-white/10 hover:border-white/20 transition">
+                {/* Video Thumbnail */}
+                <div className="aspect-video bg-gray-800 relative group">
+                  {thumb ? (
+                    <img
+                      src={thumb}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-white/50 text-4xl">🎥</span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between">
-                    <span>Uploaded:</span>
-                    <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+                  {/* Play Button Overlay */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      onClick={() => href && window.open(href, '_blank')}
+                      disabled={!href}
+                      className="bg-white/20 hover:bg-white/30 disabled:opacity-50 text-white p-3 rounded-full backdrop-blur-sm transition"
+                    >
+                      ▶️
+                    </button>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex space-x-2 mt-4">
-                  <button
-                    onClick={() => window.open(video.url, '_blank')}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 rounded-lg text-sm transition"
-                  >
-                    Watch
-                  </button>
-                  <button
-                    onClick={() => deleteVideo(video._id)}
-                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-lg text-sm transition"
-                  >
-                    Delete
-                  </button>
+                {/* Video Info */}
+                <div className="p-4">
+                  <h3 className="text-white font-semibold text-lg mb-2 truncate">
+                    {video.title}
+                  </h3>
+                  
+                  <div className="space-y-2 text-sm text-white/70">
+                    <div className="flex justify-between">
+                      <span>Size:</span>
+                      <span>{formatFileSize(video.size)}</span>
+                    </div>
+                    
+                    {video.duration && (
+                      <div className="flex justify-between">
+                        <span>Duration:</span>
+                        <span>{formatDuration(video.duration)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between">
+                      <span>Uploaded:</span>
+                      <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex space-x-2 mt-4">
+                    <button
+                      onClick={() => href && window.open(href, '_blank')}
+                      disabled={!href}
+                      className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white py-2 px-3 rounded-lg text-sm transition"
+                    >
+                      Watch
+                    </button>
+                    <button
+                      onClick={() => deleteVideo(video._id)}
+                      className="bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-lg text-sm transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

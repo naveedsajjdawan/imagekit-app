@@ -12,6 +12,9 @@ export interface IVideo {
     videoUrl: string;
     thumbnailUrl?: string;
     controls?: boolean;
+    size?: number;
+    duration?: number;
+    userId?: string;
     transformations?:{
         height:number;
         width:number;
@@ -24,9 +27,12 @@ export interface IVideo {
 const VideoSchema = new Schema<IVideo> (
     {
         title: {type: String, required: true},
-        description:{type: String, required: true},
-        thumbnailUrl:{type: String, required: true},
+        description:{type: String, default: ""},
+        thumbnailUrl:{type: String, default: ""},
         videoUrl: {type: String, required: true},
+        size: { type: Number, default: 0 },
+        duration: { type: Number, default: 0 },
+        userId: { type: String, default: "" },
         controls:{type: Boolean, default: true},
         transformations: {
             height: {type: Number, default: VIDEO_DIMENSIONS?.height},
@@ -39,6 +45,11 @@ const VideoSchema = new Schema<IVideo> (
         timestamps: true,
     }
 )
+
+// Ensure schema updates take effect during dev HMR
+if ((mongoose.models as any).Video) {
+  delete (mongoose.models as any).Video
+}
 
 const Video = models?.Video || model<IVideo>("Video", VideoSchema)
 
