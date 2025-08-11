@@ -1,6 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation";
 import React,{useMemo, useState} from "react";
+import Image from "next/image";
 
 const Page = () => {
     const [email, setEmail] = useState("");
@@ -68,9 +69,9 @@ const Page = () => {
     return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-700 via-gray-300 to-gray-100">
         <div className="bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-full max-w-md border border-white/40">
-            <h1 className="text-3xl font-extrabold text-center text-black mb-6 drop-shadow-lg">
-             Create Your Account
-            </h1>
+            <div className="flex justify-center mb-6">
+                <Image src="/next.svg" alt="Logo" width={64} height={64} priority />
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <input

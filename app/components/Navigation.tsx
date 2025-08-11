@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 
 const Navigation = () => {
   const pathname = usePathname();
@@ -11,6 +12,9 @@ const Navigation = () => {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const [avatarOverride, setAvatarOverride] = useState<string>("")
+  const [logoError, setLogoError] = useState(false)
+
+  const LOGO_PATH = process.env.NEXT_PUBLIC_LOGO_PATH || "/phovihub.png"
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -58,9 +62,20 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/dashboard" className="flex-shrink-0 flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/phovihub-logo.png" alt="Phovihub" className="h-7 w-7 object-contain" onError={(e)=>{(e.currentTarget as HTMLImageElement).style.display='none'}} />
-              <span className="text-xl font-bold text-gray-900">Phovihub</span>
+              {!logoError ? (
+                <Image
+                  src={LOGO_PATH}
+                  alt="Phovihub"
+                  width={150}
+                  height={40}
+                  className="h-10 w-auto object-contain"
+                  unoptimized
+                  priority
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <span className="text-xl font-bold text-gray-900">Phovihub</span>
+              )}
             </Link>
             
             <div className="hidden md:ml-6 md:flex md:space-x-8">
